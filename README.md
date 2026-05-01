@@ -491,7 +491,7 @@ jdbc.password=123456
 > 💡 **提示**：运行项目后，访问 http://localhost:8080/ 查看完整界面效果
 
 ### 首页
-![首页](screenshots/home.png)
+![首页](images/index.png)
 
 ### 员工列表
 ![员工列表](screenshots/list.png)
