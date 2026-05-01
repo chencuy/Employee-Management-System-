@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.mapper.EmployeeMapper">
+
+    <!-- ==================== 第3题：自定义 resultMap ==================== -->
+    <!--
+        resultMap 用于手动映射数据库字段和实体类属性
+        数据库字段：emp_name, emp_age, emp_dept
+        实体类属性：empName, empAge, empDept
+    -->
+    <resultMap id="employeeResultMap" type="Employee">
+        <id property="id" column="id"/>
+        <result property="empName" column="emp_name"/>
+        <result property="empAge" column="emp_age"/>
+        <result property="empGender" column="emp_gender"/>
+        <result property="empEmail" column="emp_email"/>
+        <result property="empDept" column="emp_dept"/>
+    </resultMap>
+
+    <!-- ==================== 第1题：基础 CRUD 功能 ==================== -->
+
+    <!-- 1. 根据 id 查询员工 -->
+    <select id="selectById" parameterType="int" resultType="Employee">
+        SELECT id, emp_name, emp_age, emp_gender, emp_email, emp_dept
+        FROM employee
+        WHERE id = #{id}
+    </select>
+
+    <!-- 2. 添加员工（返回自增主键） -->
+    <insert id="insert" parameterType="Employee" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO employee (emp_name, emp_age, emp_gender, emp_email, emp_dept)
+        VALUES (#{empName}, #{empAge}, #{empGender}, #{empEmail}, #{empDept})
+    </insert>
+
+    <!-- 3. 根据 id 修改员工信息 -->
+    <update id="updateById" parameterType="Employee">
+        UPDATE employee
+        SET emp_name = #{empName},
+            emp_age = #{empAge},
+            emp_gender = #{empGender},
+            emp_email = #{empEmail},
+            emp_dept = #{empDept}
+        WHERE id = #{id}
+    </update>
+
+    <!-- 4. 根据 id 删除员工 -->
+    <delete id="deleteById" parameterType="int">
+        DELETE FROM employee WHERE id = #{id}
+    </delete>
+
+    <!-- 5. 查询所有员工 -->
+    <select id="selectAll" resultType="Employee">
+        SELECT id, emp_name, emp_age, emp_gender, emp_email, emp_dept
+        FROM employee
+    </select>
+
+    <!-- ==================== 第2题：多种参数传递方式 ==================== -->
+
+    <!-- 1. 根据姓名 + 部门精确查询（多参数传递 @Param） -->
+    <select id="selectByNameAndDept" resultType="Employee">
+        SELECT id, emp_name, emp_age, emp_gender, emp_email, emp_dept
+        FROM employee
+        WHERE emp_name = #{empName} AND emp_dept = #{empDept}
+    </select>
+
+    <!-- 2. 根据年龄 > ? 并且 性别 = ? 查询（Map 传参） -->
+    <select id="selectByAgeAndGender" parameterType="map" resultType="Employee">
+        SELECT id, emp_name, emp_age, emp_gender, emp_email, emp_dept
+        FROM employee
+        WHERE emp_age > #{empAge} AND emp_gender = #{empGender}
+    </select>
+
+    <!-- 3. 根据姓名模糊查询（实体类传参） -->
+    <select id="selectByNameLike" parameterType="Employee" resultType="Employee">
+        SELECT id, emp_name, emp_age, emp_gender, emp_email, emp_dept
+        FROM employee
+        WHERE emp_name LIKE CONCAT('%', #{empName}, '%')
+    </select>
+
+    <!-- ==================== 第3题：使用 resultMap 查询 ==================== -->
+
+    <!-- 根据 id 查询员工，使用自定义 resultMap -->
+    <select id="selectByIdWithResultMap" parameterType="int" resultMap="employeeResultMap">
+        SELECT id, emp_name, emp_age, emp_gender, emp_email, emp_dept
+        FROM employee
+        WHERE id = #{id}
+    </select>
+
+    <!-- ==================== 第4题：动态 SQL 综合实现 ==================== -->
+
+    <!-- 1. 多条件组合查询（动态SQL） -->
+    <select id="selectByCondition" parameterType="Employee" resultType="Employee">
+        SELECT id, emp_name, emp_age, emp_gender, emp_email, emp_dept
+        FROM employee
+        <where>
+            <if test="empName != null and empName != ''">
+                AND emp_name LIKE CONCAT('%', #{empName}, '%')
+            </if>
+            <if test="empAge != null">
+                AND emp_age = #{empAge}
+            </if>
+            <if test="empGender != null and empGender != ''">
+                AND emp_gender = #{empGender}
+            </if>
+            <if test="empDept != null and empDept != ''">
+                AND emp_dept = #{empDept}
+            </if>
+        </where>
+    </select>
+
+    <!-- 2. 动态更新（只更新非空字段） -->
+    <update id="updateDynamic" parameterType="Employee">
+        UPDATE employee
+        <set>
+            <if test="empName != null and empName != ''">
+                emp_name = #{empName},
+            </if>
+            <if test="empAge != null">
+                emp_age = #{empAge},
+            </if>
+            <if test="empGender != null and empGender != ''">
+                emp_gender = #{empGender},
+            </if>
+            <if test="empEmail != null and empEmail != ''">
+                emp_email = #{empEmail},
+            </if>
+            <if test="empDept != null and empDept != ''">
+                emp_dept = #{empDept},
+            </if>
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <!-- 3. 批量删除（传入多个id） -->
+    <delete id="deleteByIds" parameterType="list">
+        DELETE FROM employee
+        WHERE id IN
+        <foreach collection="list" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+</mapper>
