@@ -494,13 +494,13 @@ jdbc.password=123456
 ![首页](images/index.png)
 
 ### 员工列表
-![员工列表](screenshots/list.png)
+![员工列表](images/yuangong.png)
 
 ### 添加员工
-![添加员工](screenshots/add.png)
+![添加员工](images/tianjia.png)
 
 ### 高级查询中心
-![高级查询](screenshots/query.png)
+![高级查询](images/gaoji.png)
 
 ---
 
